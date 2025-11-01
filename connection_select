@@ -1,0 +1,52 @@
+#!/bin/bash
+
+active=$(nmcli -t -f NAME,DEVICE connection show --active)
+
+wired_conns=$(nmcli -t -f NAME,TYPE connection show | grep ethernet | sort)
+vpn_conns=$(nmcli -t -f NAME,TYPE connection show | grep vpn | sort)
+
+menu_list=""
+
+if [[ -n "$wired_conns" ]]; then
+	menu_list+="Wired\n"
+	while IFS=: read -r name type; do
+		[[ -z "$name" ]] && continue
+		if echo "$active" | grep -q "^$name:"; then
+			prefix=""
+		else
+			prefix=""
+		fi
+		menu_list+="$prefix 󰈀 $name\n"
+	done <<< "$wired_conns"
+	menu_list=$(echo -e "$menu_list" | sed '${/^$/d}')
+fi
+
+if [[ -n "$vpn_conns" ]]; then
+	if [[ -n "$wired_conns" ]]; then
+		menu_list+="\n"
+	fi
+	menu_list+="VPNs\n"
+	while IFS=: read -r name type; do
+		[[ -z "$name" ]] && continue
+		if echo "$active" | grep -q "^$name:"; then
+			prefix=""
+		else
+			prefix=""
+		fi
+		menu_list+="$prefix 󰖂 $name\n"
+	done <<< "$vpn_conns"
+fi
+
+menu_list=$(echo -e "$menu_list" | sed '/^$/d;$!b;$d')
+
+choice=$(echo -e "$menu_list" | rofi -dmenu -theme ~/.config/rofi/connection_select.rasi -no-fixed-num-lines)
+[[ -z "$choice" ]] && exit 0
+
+chosen=$(echo "$choice" | sed 's/^.* //')
+type=$(nmcli -t -f TYPE connection show "$chosen" | head -n1 | cut -d: -f2)
+
+if echo "$active" | grep -q "^$chosen:"; then
+	nmcli connection down "$chosen" && notify-send "Disconnected" "$chosen"
+else
+	nmcli connection up "$chosen" && notify-send "Connected" "$chosen"
+fi

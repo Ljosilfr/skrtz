@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if pgrep -x wl-screenrec > /dev/null; then
+	killall wl-screenrec
+	exit
+fi
+
+dir="/home/fenrjon/screen_dumps/recordings"
+date=$(date +%d_%m_%Y)
+filename=$date.mp4
+number=0
+
+cd "$dir"
+
+while [ -e "$filename" ]; do
+	printf -v filename '%s_%0d.mp4' "$date" "$(( ++number ))"
+done
+
+wl-screenrec --audio --audio-device alsa_output.pci-0000_00_1f.3.hdmi-stereo.monitor --filename $filename --no-cursor

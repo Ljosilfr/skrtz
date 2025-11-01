@@ -1,0 +1,36 @@
+#!/bin/bash
+
+dir="/home/fenrjon/screen_dumps"
+date=$(date +%s_%d_%m_%Y_screenshot )
+filename=$date.png
+number=0
+
+cd "$dir" || exit 1
+
+while [ -e "$filename" ]; do
+	printf -v filename '%s-%02d.png' "$date" "$(( ++number ))"
+done
+
+capture_section() {
+	wayshot -s "$(slurp)" -f "$filename"
+}
+
+capture_output() {
+	wayshot -f "$filename"
+}
+
+copy_clipboard() {
+	wl-copy --type image/png < "$filename"
+}
+
+case "$1" in
+	--section)
+	capture_section && copy_clipboard ;;
+	--output)
+	capture_output && copy_clipboard ;;
+	--help|"")
+	echo "Usage: $0 [--section | --output | --help]" ;;
+	*)
+	echo "Unknown option: $1"
+	exit 1 ;;
+esac

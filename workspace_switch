@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+if pgrep -x rofi > /dev/null; then
+	killall rofi
+	exit
+fi
+
+declare -A MAP
+names=()
+ids=()
+
+CURRENT_NAME=$(hyprctl -j activeworkspace | jq -r '.name')
+
+while read -r id name; do
+	MAP["$name"]="$id"
+	names+=("$name")
+	ids+=("$id")
+done < <(hyprctl -j workspaces | jq -r '.[] | "\(.id) \(.name)"' | sort -n)
+
+selected_index=0
+for i in "${!names[@]}"; do
+	if [[ "${names[$i]}" == "$CURRENT_NAME" ]]; then
+		selected_index="$i"
+		break
+	fi
+done
+
+NEW_OPTION="󱅃"
+names+=("$NEW_OPTION")
+
+NAMES=$(printf "%s\n" "${names[@]}")
+ID=$(echo "$NAMES" | rofi -dmenu \
+	-theme ~/.config/rofi/workspace_switch.rasi \
+	-no-fixed-num-lines \
+	-selected-row "$selected_index")
+
+if [[ "$ID" == "$NEW_OPTION" ]]; then
+	max_id=0
+	for id in "${ids[@]}"; do
+		(( id > max_id )) && max_id="$id"
+	done
+	next_id=$((max_id + 1))
+
+	hyprctl dispatch workspace "$next_id"
+	exit
+fi
+
+if [[ -n "$ID" && -n "${MAP[$ID]}" ]]; then
+	hyprctl dispatch workspace "${MAP[$ID]}"
+fi

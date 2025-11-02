@@ -26,4 +26,4 @@ case "$1" in
 	exit 1 ;;
 esac
 
-notify-send -i $file "Screen Dump storaged succesfuly" "$file" 
+notify-send -i $file "Screen dumped sucessfuly" "$file" 

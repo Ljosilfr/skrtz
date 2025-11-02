@@ -1,26 +1,17 @@
 #!/bin/bash
 
-dir="/home/fenrjon/screen_dumps"
-date=$(date +%s_%d_%m_%Y_screenshot )
-filename=$date.png
-number=0
-
-cd "$dir" || exit 1
-
-while [ -e "$filename" ]; do
-	printf -v filename '%s-%02d.png' "$date" "$(( ++number ))"
-done
+file="/home/fenrjon/screen_dumps/$(date +%s_%d_%m_%Y_)screenshot.png"
 
 capture_section() {
-	wayshot -s "$(slurp)" -f "$filename"
+	wayshot -s "$(slurp)" -f "$file"
 }
 
 capture_output() {
-	wayshot -f "$filename"
+	wayshot -f "$file"
 }
 
 copy_clipboard() {
-	wl-copy --type image/png < "$filename"
+	wl-copy --type image/png < "$file"
 }
 
 case "$1" in
@@ -34,3 +25,5 @@ case "$1" in
 	echo "Unknown option: $1"
 	exit 1 ;;
 esac
+
+notify-send -i $file "Screen Dump storaged succesfuly" "$file" 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file="/home/fenrjon/screen_dumps/$(date +%s_%d_%m_%Y_)screenshot.png"
+file="/home/fenrjon/screen_dumps/$(date +%s%N_)screenshot.png"
 
 capture_section() {
 	wayshot -s "$(slurp)" -f "$file"

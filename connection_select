@@ -1,14 +1,10 @@
 #!/bin/bash
 
 active=$(nmcli -t -f NAME,DEVICE connection show --active)
-
 wired_conns=$(nmcli -t -f NAME,TYPE connection show | grep ethernet | sort)
 vpn_conns=$(nmcli -t -f NAME,TYPE connection show | grep vpn | sort)
 
-menu_list=""
-
 if [[ -n "$wired_conns" ]]; then
-	menu_list+="Wired\n"
 	while IFS=: read -r name type; do
 		[[ -z "$name" ]] && continue
 		if echo "$active" | grep -q "^$name:"; then
@@ -25,7 +21,6 @@ if [[ -n "$vpn_conns" ]]; then
 	if [[ -n "$wired_conns" ]]; then
 		menu_list+="\n"
 	fi
-	menu_list+="VPNs\n"
 	while IFS=: read -r name type; do
 		[[ -z "$name" ]] && continue
 		if echo "$active" | grep -q "^$name:"; then
@@ -46,7 +41,7 @@ chosen=$(echo "$choice" | sed 's/^.* //')
 type=$(nmcli -t -f TYPE connection show "$chosen" | head -n1 | cut -d: -f2)
 
 if echo "$active" | grep -q "^$chosen:"; then
-	nmcli connection down "$chosen" && notify-send "Disconnected" "$chosen"
+	nmcli connection down "$chosen" && notify-send -i network "Network Manager" "Disconnected from $chosen"
 else
-	nmcli connection up "$chosen" && notify-send "Connected" "$chosen"
+	nmcli connection up "$chosen" && notify-send -i network "Network Manager" "Connected to $chosen"
 fi

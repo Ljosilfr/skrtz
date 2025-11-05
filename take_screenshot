@@ -2,28 +2,30 @@
 
 file="/home/fenrjon/screen_dumps/$(date +%s%N_)screenshot.png"
 
-capture_section() {
+dmp_s() {
 	wayshot -s "$(slurp)" -f "$file"
 }
 
-capture_output() {
+dmp_o() {
 	wayshot -f "$file"
 }
 
-copy_clipboard() {
+copy() {
 	wl-copy --type image/png < "$file"
 }
 
+notify() {	
+	if [ -f "$file" ]; then
+		notify-send -i $file "Screen dumped sucessfuly" "$file"
+	fi
+}
+
 case "$1" in
-	--section)
-	capture_section && copy_clipboard ;;
-	--output)
-	capture_output && copy_clipboard ;;
-	--help|"")
-	echo "Usage: $0 [--section | --output | --help]" ;;
+	-s)
+	dmp_s && copy && notify ;;
+	-o)
+	dmp_o && copy && notify ;;
 	*)
-	echo "Unknown option: $1"
+	echo "idk what that is"
 	exit 1 ;;
 esac
-
-notify-send -i $file "Screen dumped sucessfuly" "$file" 

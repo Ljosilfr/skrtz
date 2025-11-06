@@ -1,5 +1,0 @@
-#!/bin/bash
-
-xd=$1
-
-notify-send -i stop "MIRA" "$xd"

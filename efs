@@ -1,0 +1,11 @@
+#!/bin/bash
+
+case "$1" in
+	on) easyeffects -b 2 ;;
+	off) easyeffects -b 1 ;;
+	s) easyeffects -b 3 ;;
+	1) easyeffects -l cca-polaris ;;
+	2) easyeffects -l speakers-fun ;;
+	3) easyeffects -l speakers-far ;;
+	*) echo "unknown argument" ;;
+esac

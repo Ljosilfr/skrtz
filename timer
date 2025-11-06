@@ -1,28 +1,29 @@
 #!/bin/bash
 
-tmrval=$1
 start=$(date +%s)
 
-if [[ "$DETACHED" != "1" ]]; then
-    export DETACHED=1
-    setsid "$0" "$@" > /dev/null 2>&1 &
-    exit 0
-fi
-
-case "$tmrval" in
-	*s) duration=${tmrval%s} ;;
-	*m) duration=$(( ${tmrval%m} * 60 )) ;;
-	*h) duration=$(( ${tmrval%h} * 3600 )) ;;
-	*) duration=${tmrval%s} ;;
+case "$1" in
+	*s) duration=${1%s} ;;
+	*m) duration=$(( ${1%m} * 60 )) ;;
+	*h) duration=$(( ${1%h} * 3600 )) ;;
+	*) echo;
+	   echo "Unknown argument.";
+	   echo "Format: Xs, Xm, Xh.";
+	   exit ;;
 esac
 
-while true; do
+while [ "$duration" -gt 0 ]; do
 	now=$(date +%s)
 	elapsed=$((now - start))
-	sleep 0.05
-	if (( elapsed >= duration )); then
-		notify-send -i clock "Timer" "Time is up!"
-		break
+	if [[ $duration -gt "3600" ]]; then
+		echo  󱎫 $(( duration / 3600 )):$( echo $(( duration / 120  )) | sed 's/^60$/00/'):$( printf "%02d" $((duration % 60 )) )
+	elif [[ $duration -gt "60" ]]; then
+		echo 󱎫 $(( duration / 60 )):$( printf "%02d" $((duration % 60 )) )
+	else
+		echo 󱎫 $duration
 	fi
+	sleep 1s
+	duration=$(( duration - 1 ))
 done
 
+notify-send -i clock "Timer" "Time is up!"

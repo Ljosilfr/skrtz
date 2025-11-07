@@ -1,0 +1,12 @@
+#!/bin/bash
+
+while true; do
+	url="$1"
+	patterns="failed|fail|error|forbidden|fatal"
+	if unbuffer axel "$url" 2>&1 | tee /dev/tty | grep -iqE "$patterns"; then
+		notify-send -i error "Download failed"
+	else
+		notify-send -i download "All files downloaded!"
+	fi
+	break
+done

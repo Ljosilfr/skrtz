@@ -1,0 +1,13 @@
+#!/bin/bash
+
+day_num=$(echo $(date +%d) | sed 's/^0//')
+rest_of_it=$(date "+%B of %Y, %A")
+
+case $day_num in
+	1|21|31) suffix="st" ;;
+	2|22) suffix="nd" ;;
+	3|23) suffix="rd" ;;
+	*) suffix="th" ;;
+esac
+
+echo "󰭧 ${day_num}${suffix} ${rest_of_it}"

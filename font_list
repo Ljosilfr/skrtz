@@ -1,3 +1,0 @@
-#!/bin/bash
-
-fc-list | awk -F: '{sub(/,.*/, "", $2); print $2}' | sort | uniq | fzf --layout=reverse | wl-copy

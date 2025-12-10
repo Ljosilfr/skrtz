@@ -1,0 +1,33 @@
+#!/bin/bash
+
+_ps="waybar mako swww-daemon"
+for _prs in $_ps; do
+    if [ "$(pidof "${_prs}")" ]; then
+        killall -9 "${_prs}"
+    fi
+done
+
+swww-daemon &
+mako &
+foot --server &
+waybar -c ~/.config/waybar/config_dwl.jsonc -s ~/.config/waybar/style_dwl.css &
+easyeffects --service-mode -w &
+
+for portal in xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal; do
+    pkill -e "$portal"
+done
+
+/usr/libexec/xdg-desktop-portal-wlr &
+/usr/libexec/xdg-desktop-portal-gtk &
+
+sleep 1
+
+/usr/libexec/xdg-desktop-portal &
+
+if [ -x "/usr/bin/lxqt-policykit-agent" ]; then
+    /usr/bin/lxqt-policykit-agent &
+fi
+
+#wlr-randr --output VGA-1 --custom-mode 1440x900@60 &
+
+exec dbus-update-environment WAYLAND_DISPLAY

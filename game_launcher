@@ -1,0 +1,58 @@
+#!/bin/bash
+
+export mesa_glthread=true
+export vblank_mode=0
+
+data_file="/home/fenrjon/.config/lutris_gamelist.json"
+
+gen_df() {
+    lutris --list-games --json > "$data_file"
+}
+
+if [ ! -f "$data_file" ]; then
+    gen_df
+elif [ "$1" == "refresh" ]; then
+    rm "$data_file"
+    gen_df
+fi
+
+game_list=$(jq '.[] | "\(.id) \(.name)"' "$data_file" |
+        sed 's/"//g')
+
+chosen_game=$(echo "$game_list" |
+    awk '{$1=""; print}' |
+    rofi \
+        -dmenu \
+        -theme ~/.config/rofi/game_launcher.rasi \
+        -no-fixed-num-lines)
+
+game_id=$(echo "$game_list" |
+    grep ".${chosen_game}$" |
+    awk '{print $1}')
+
+case "$game_id" in
+    17)
+        n_w="1152"
+        n_h="720"
+    ;;
+    36|37|35|19|5)
+        n_w="1280"
+        n_h="800"
+    ;;
+    *)
+        n_w="1440"
+        n_h="900"
+    ;;
+esac
+
+if [ -z "$chosen_game" ]; then
+    echo "Select a game to launch with Gamescope"
+    exit 0
+else
+    gamescope \
+        --force-windows-fullscreen \
+        --force-grab-cursor \
+        -f -r 60 \
+        -w "$n_w" -h "$n_h" \
+        -- lutris lutris:rungameid/"$game_id"
+fi

@@ -2,7 +2,7 @@
 
 while true; do
 	url="$1"
-	patterns="failed|fail|error|forbidden|fatal"
+	patterns="failed|fail|error|forbidden|fatal|unable"
 	if unbuffer axel "$url" 2>&1 | tee /dev/tty | grep -iqE "$patterns"; then
 		notify-send -i error "Download failed"
 	else
@@ -10,3 +10,4 @@ while true; do
 	fi
 	break
 done
+

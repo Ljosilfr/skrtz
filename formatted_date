@@ -10,4 +10,4 @@ case $day_num in
 	*) suffix="th" ;;
 esac
 
-echo "󰭧 ${day_num}${suffix} ${rest_of_it}"
+echo "<span size='14pt' rise='-1500'>󰭧</span> ${day_num}${suffix} ${rest_of_it}"

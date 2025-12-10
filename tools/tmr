@@ -12,7 +12,7 @@ case "$1" in
 	   exit ;;
 esac
 
-while [ "$duration" -gt 0 ]; do
+while [[ "$duration" -gt 0 ]]; do
 	now=$(date +%s)
 	elapsed=$((now - start))
 	if [[ $duration -gt "3600" ]]; then

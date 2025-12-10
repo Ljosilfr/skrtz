@@ -2,30 +2,20 @@
 
 file="/home/fenrjon/screen_dumps/$(date +%s%N_)screenshot.png"
 
-dmp_s() {
-	wayshot -s "$(slurp)" -f "$file"
-}
-
-dmp_o() {
-	wayshot -f "$file"
-}
-
 copy() {
 	wl-copy --type image/png < "$file"
 }
 
-notify() {	
-	if [ -f "$file" ]; then
-		notify-send -i $file "Screen dumped sucessfuly" "$file"
-	fi
-}
-
 case "$1" in
 	-s)
-	dmp_s && copy && notify ;;
+	wayshot -s "$(slurp)" -f "$file" && copy ;;
 	-o)
-	dmp_o && copy && notify ;;
+	wayshot -f "$file" && copy ;;
 	*)
 	echo "idk what that is"
 	exit 1 ;;
 esac
+
+if [ -f "$file" ]; then
+	notify-send -i $file "Screen dumped sucessfuly" "$file"
+fi

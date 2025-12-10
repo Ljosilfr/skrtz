@@ -1,0 +1,58 @@
+#!/bin/bash
+
+img="-i $1"
+
+case "$3" in
+	1)  cts="--contrast 0.2"  ;;
+	2)  cts="--contrast 0.4"  ;;
+	3)  cts="--contrast 0.6"  ;;
+	4)  cts="--contrast 0.8"  ;;
+	5)  cts="--contrast 1"	  ;;
+	6)  cts="--contrast 1.2"  ;;
+	7)  cts="--contrast 1.4"  ;;
+	8)  cts="--contrast 1.6"  ;;
+	9)  cts="--contrast 1.8"  ;;
+	10) cts='--contrast 2'    ;;
+	11) cts="--contrast 2.2"  ;;
+	12) cts="--contrast 2.4"  ;;
+	13) cts="--contrast 2.6"  ;;
+	14) cts="--contrast 2.8"  ;;
+	15) cts="--contrast 3"	  ;;
+	16) cts="--contrast 2.2"  ;;
+	17) cts="--contrast 2.4"  ;;
+	18) cts="--contrast 2.6"  ;;
+	19) cts="--contrast 2.8"  ;;
+	20) cts="--contrast 3"    ;;
+esac
+
+case "$2" in
+	1)  bnd="--backend wal"      ;;
+	2)  bnd="--backend okthief"  ;;
+	3)  bnd="--backend haishoku" ;;
+esac
+
+case "$4" in
+	1)  stn="--saturate 0.2"  ;;
+	2)  stn="--saturate 0.4"  ;;
+	3)  stn="--saturate 0.6"  ;;
+	4)  stn="--saturate 0.8"  ;;
+	5)  stn="--saturate 1"	  ;;
+	6)  stn="--saturate 1.2"  ;;
+	7)  stn="--saturate 1.4"  ;;
+	8)  stn="--saturate 1.6"  ;;
+	9)  stn="--saturate 1.8"  ;;
+	10) stn="--saturate 2"	  ;;
+	11) stn="--saturate 2.2"  ;;
+	12) stn="--saturate 2.4"  ;;
+	13) stn="--saturate 2.6"  ;;
+	14) stn="--saturate 2.8"  ;;
+	15) stn="--saturate 3"	  ;;
+	16) stn="--saturate 2.2"  ;;
+	17) stn="--saturate 2.4"  ;;
+	18) stn="--saturate 2.6"  ;;
+	19) stn="--saturate 2.8"  ;;
+	20) stn="--saturate 3"    ;;
+esac
+
+SWWW_TRANSITION=none swww img "$1"
+wal -n $img $bnd $cts $stn

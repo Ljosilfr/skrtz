@@ -4,6 +4,10 @@ export mesa_glthread=true
 export vblank_mode=0
 
 data_file="/home/fenrjon/.config/lutris_gamelist.json"
+rofi_theme="~/.config/rofi/game_launcher.rasi"
+
+n_w="1440"
+n_h="900"
 
 gen_df() {
     lutris --list-games --json > "$data_file"
@@ -16,19 +20,17 @@ elif [ "$1" == "refresh" ]; then
     gen_df
 fi
 
-game_list=$(jq '.[] | "\(.id) \(.name)"' "$data_file" |
-        sed 's/"//g')
+game_list=$(jq '.[] | { ( .name ): { id: .id } }' "$data_file" |
+    jq -s add)
 
-chosen_game=$(echo "$game_list" |
-    awk '{$1=""; print}' |
+chosen_game=$(jq -r '.[] .name' "$data_file" |
     rofi \
         -dmenu \
-        -theme ~/.config/rofi/game_launcher.rasi \
+        -theme "$rofi_theme" \
         -no-fixed-num-lines)
 
 game_id=$(echo "$game_list" |
-    grep ".${chosen_game}$" |
-    awk '{print $1}')
+    jq --arg var "$chosen_game" '.[$var].id')
 
 case "$game_id" in
     17)
@@ -39,10 +41,7 @@ case "$game_id" in
         n_w="1280"
         n_h="800"
     ;;
-    *)
-        n_w="1440"
-        n_h="900"
-    ;;
+    *);;
 esac
 
 if [ -z "$chosen_game" ]; then

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-img="$1"
-
-SWWW_TRANSITION=none swww img "$img"
-hellwal -i "$img" -m -b 0.1 -g 0.4 --static-background "#101010"

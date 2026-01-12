@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if pgrep -x rofi; then 
+	killall -e rofi 
+    exit
+fi
+
+rofi \
+    -show drun \
+    -theme ~/.config/rofi/app_launcher.rasi \
+    -no-fixed-num-lines

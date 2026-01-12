@@ -1,0 +1,11 @@
+#!/bin/bash
+
+url=$(cliphist list |
+    head -n -1 |
+    cliphist decode)
+    
+if [[ -z "$url" ]]; then
+    echo "Select an URL to stream"
+else
+    mpv "$url"
+fi

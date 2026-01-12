@@ -1,0 +1,27 @@
+#!/bin/bash
+
+file=~/screen_dumps/$(date +%s%n)_screenshot.png
+
+capture_select() {
+	scrot -s -F $file -e 'xclip -selection clipboard -t image/png -i $f'
+}
+
+capture_output() {
+	scrot -F $file -e 'xclip -selection clipboard -t image/png -i $f'
+}
+
+notify() {
+	if [ -f "$file" ]; then
+		notify-send -i $file "Screen dumped!" "$file"
+	fi
+}
+
+case "$1" in
+	--select)
+	capture_select && notify ;;
+	--output)
+	capture_output && notify ;;
+	*)
+	echo "Unknown argument: $1"
+	exit 1 ;;
+esac

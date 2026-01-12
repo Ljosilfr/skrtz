@@ -1,6 +1,0 @@
-#!/bin/bash
-
-file="$1"
-img="$2"
-
-ffmpeg -i "$file" -i "$img"  -map 0:a -map 1 -codec copy -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -disposition:v attached_pic o/"$file"

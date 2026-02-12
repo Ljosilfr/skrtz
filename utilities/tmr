@@ -1,22 +1,17 @@
 #!/bin/bash
-
 start=$(date +%s)
-
 case "$1" in
-	*s) duration=${1%s} ;;
-	*m) duration=$(( ${1%m} * 60 )) ;;
-	*h) duration=$(( ${1%h} * 3600 )) ;;
-	*) echo;
-	   echo "Unknown argument.";
-	   echo "Format: Xs, Xm, Xh.";
-	   exit ;;
+	*s)duration=${1%s};;
+	*m)duration=$(( ${1%m} * 60 ));;
+	*h)duration=$(( ${1%h} * 3600 ));;
+	*);;
 esac
-
 while [[ "$duration" -gt 0 ]]; do
 	now=$(date +%s)
 	elapsed=$((now - start))
 	if [[ $duration -gt "3600" ]]; then
-		echo  󱎫 $(( duration / 3600 )):$( echo $(( duration / 120  )) | sed 's/^60$/00/'):$( printf "%02d" $((duration % 60 )) )
+		echo  󱎫 $(( duration / 3600 )):$( echo $(( duration / 120  )) |
+		    sed 's/^60$/00/'):$( printf "%02d" $((duration % 60 )) )
 	elif [[ $duration -gt "60" ]]; then
 		echo 󱎫 $(( duration / 60 )):$( printf "%02d" $((duration % 60 )) )
 	else
@@ -25,5 +20,4 @@ while [[ "$duration" -gt 0 ]]; do
 	sleep 1s
 	duration=$(( duration - 1 ))
 done
-
 notify-send -i clock "Timer" "Time is up!"

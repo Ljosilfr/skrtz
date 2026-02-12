@@ -1,62 +1,46 @@
 #!/bin/bash
-
-export mesa_glthread=true
-export vblank_mode=0
-
-data_file="/home/fenrjon/.config/lutris_gamelist.json"
-rofi_theme="~/.config/rofi/game_launcher.rasi"
-
-n_w="1440"
-n_h="900"
-
+data_file="$HOME/.config/lutris_gamelist.json"
+screen_width="1440"
+screen_height="900"
 if pgrep -x rofi; then
     killall -e rofi
-    exit
+    exit 0
+elif pgrep -x gamescope-wl; then
+    notify-send "There is another gamescope session running!"
+    exit 0
 fi
-
-gen_df() {
+generate_data_file() {
     lutris --list-games --json > "$data_file"
 }
-
-if [ ! -f "$data_file" ]; then
-    gen_df
-elif [ "$1" == "refresh" ]; then
+[[ ! -f "$data_file" ]] && generate_data_file
+[[ "$1" == "refresh" ]] && {
     rm "$data_file"
-    gen_df
-fi
-
-game_list=$(jq '.[] | { ( .name ): { id: .id } }' "$data_file" |
-    jq -s add)
-
+    generate_data_file
+}
 chosen_game=$(jq -r '.[] .name' "$data_file" |
     rofi \
         -dmenu \
-        -theme "$rofi_theme" \
-        -no-fixed-num-lines)
-
-game_id=$(echo "$game_list" |
+        -theme game_launcher \
+        -no-fixed-num-lines) 
+game_id=$(jq '.[] | { ( .name ): { id: .id } }' "$data_file" |
+    jq -s add |
     jq --arg var "$chosen_game" '.[$var].id')
-
 case "$game_id" in
     17)
-        n_w="1152"
-        n_h="720"
+        screen_width="1152"
+        screen_height="720"
     ;;
     36|37|35|19|5)
-        n_w="1280"
-        n_h="800"
+        screen_width="1280"
+        screen_height="800"
     ;;
     *);;
 esac
-
-if [ -z "$chosen_game" ]; then
-    echo "Select a game to launch with Gamescope"
-    exit 0
-else
-    gamescope \
-        --force-windows-fullscreen \
-        --force-grab-cursor \
-        --fullscreen \
-        -w "$n_w" -h "$n_h" -r 60 \
-        -- lutris lutris:rungameid/"$game_id"
-fi
+[[ -z "$chosen_game" ]] && exit 1
+gamescope \
+    --expose-wayland \
+    --force-windows-fullscreen \
+    --force-grab-cursor \
+    --fullscreen \
+    -w "$screen_width" -h "$screen_height" -r 60 \
+    -- lutris lutris:rungameid/"$game_id"

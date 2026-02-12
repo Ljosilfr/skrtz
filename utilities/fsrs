@@ -1,0 +1,5 @@
+#!/bin/bash
+pgrep -x foot && {
+    killall foot
+    foot --server &
+}

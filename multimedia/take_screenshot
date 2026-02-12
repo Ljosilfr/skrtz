@@ -1,21 +1,8 @@
 #!/bin/bash
-
-file="/home/fenrjon/screen_dumps/$(date +%s%N_)screenshot.png"
-
-copy() {
-	wl-copy --type image/png < "$file"
-}
-
+file="~/screen_dumps/$(date +%s%N_)screenshot.png"
 case "$1" in
-	-s)
-	wayshot -s "$(slurp)" -f "$file" && copy ;;
-	-o)
-	wayshot -f "$file" && copy ;;
-	*)
-	echo "idk what that is"
-	exit 1 ;;
+	-s) wayshot -g --clipboard "$file";;
+	-o) wayshot "$file";;
+	*);;
 esac
-
-if [ -f "$file" ]; then
-	notify-send -i $file "Screen dumped sucessfuly" "$file"
-fi
+[[ -f "$file" ]] && notify-send -i $file "Screen dumped sucessfuly" "$file"

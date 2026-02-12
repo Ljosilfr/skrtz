@@ -1,9 +1,3 @@
 #!/bin/bash
-
 url=$(gpaste-client --raw history | head -n1)
-
-if [ -z "$url" ]; then
-	echo "No URLs to stream"
-else
-	mpv "$url"
-fi
+[[ -n "$url" ]] && mpv "$url"

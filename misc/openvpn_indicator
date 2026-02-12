@@ -1,0 +1,4 @@
+#!/bin/bash
+pgrep -x openvpn > /dev/null && {
+    echo "<span size='16pt' rise='-1500'>󰖂</span>"
+}

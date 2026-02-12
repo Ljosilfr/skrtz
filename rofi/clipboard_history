@@ -1,12 +1,11 @@
 #!/bin/bash
-
-if pgrep -x rofi; then
+pgrep -x rofi && {
 	killall -e rofi
-    exit
-fi
-
-cliphist list |
-rofi -dmenu -no-fixed-num-lines -theme \
-~/.config/rofi/clipboard_history.rasi |
-cliphist decode |
-wl-copy
+    exit 0
+}
+clipvault list |
+    rofi -dmenu \
+        -no-fixed-num-lines \
+        -theme clipboard_history |
+    clipvault get |
+    wl-copy

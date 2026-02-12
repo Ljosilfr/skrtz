@@ -1,0 +1,19 @@
+#!/bin/bash
+PID=$(pgrep -x vigiland)
+PSTATE=$(cat /proc/"${PID}"/status |
+        awk -F'(' '/State/ {print $2}' |
+        sed 's/)/ /g' | sed 's/ //g')
+case "$1" in
+    -t)
+        case "$PSTATE" in
+            sleeping) kill -STOP "$PID" ;;
+            stopped) kill -CONT "$PID" ;;
+        esac
+    ;;
+    -s)
+        case "$PSTATE" in
+            sleeping) echo "<span size='13.5pt' rise='-1500'></span>" ;;
+            stopped) echo "<span size='13.5pt' rise='-1500'></span>" ;;
+        esac
+    ;;
+esac

@@ -1,11 +1,9 @@
 #!/bin/bash
-
-if pgrep -x rofi; then 
+pgrep -x rofi && {
 	killall -e rofi 
-    exit
-fi
-
+    exit 0
+}
 rofi \
     -show drun \
-    -theme ~/.config/rofi/app_launcher.rasi \
+    -theme app_launcher \
     -no-fixed-num-lines

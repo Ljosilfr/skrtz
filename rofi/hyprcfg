@@ -1,0 +1,20 @@
+#!/bin/bash
+list="󱢣 General\n Keybinds\n Startup\n󱃻 Variables\n󱂬 WindowRules"
+pgrep -x rofi && {
+    killall -e rofi
+    exit 0
+}
+choice=$(echo -e "$list" |
+    rofi \
+        -dmenu \
+        -no-fixed-num-lines \
+        -theme hyprcfg |
+    awk '{print $2}')
+case "$choice" in
+    General)conf_file="~/.config/hypr/hyprland.conf";;
+    Keybinds)conf_file="~/.config/hypr/keybinds.conf";;
+    Startup)conf_file="~/.config/hypr/startup.conf";;
+    Variables)conf_file="~/.config/hypr/variables.conf";;
+    WindowRules)conf_file="~/.config/hypr/windowrules.conf";;
+esac
+[[ -n "$choice" ]] && footclient sh -c "(cat ~/.cache/wal/sequences &); nvim ${conf_file}"

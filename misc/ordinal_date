@@ -1,10 +1,8 @@
 #!/bin/bash
-
 case "$(date "+%-d")" in
 	1|21|31)sfx="st";;
 	2|22)sfx="nd";;
 	3|23)sfx="rd";;
 	*)sfx="th";;
 esac
-
 echo "$(date "+%A, %-d${sfx} %B %Y")"

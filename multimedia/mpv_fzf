@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[[ -z "$(file -i  "$HOME"/.temp_streaming/* | grep 'video/')" ]] && {
+	notify-send "Media folder is empty!"
+	exit 0
+}
+[[ -n "$(pgrep -x mpv)" ]] && {
+	notify-send "MPV is already running!"
+	exit 0
+}
+wayland_block () {
+	footclient -T mpv_fzf bash -c '
+		set -m
+		media_file="$(
+			find "$HOME"/.temp_streaming/* \
+				-type f \
+				! -iregex ".*aria2.*" |
+			sort | fzf \
+				--reverse \
+				--no-input \
+				--style=full \
+				--wrap=word \
+				--wrap-sign= \
+				--delimiter / --with-nth -1 \
+				--preview-window='right:40%:wrap' \
+				--preview="ffmpeg -i {} -vf "thumbnail,scale=320:-1" -frames:v 1 -f image2pipe pipe:1 -loglevel quiet | img2sixel -q low"
+			)"
+		[[ -z "$media_file" ]] && exit 0
+		mpv --no-terminal "$media_file" & disown
+	'
+}
+tty_block () {
+	set -m
+	media_file="$(
+		find "$HOME"/.temp_streaming/* \
+			-type f \
+			! -iregex ".*aria2.*" |
+		sort | fzf \
+			--reverse \
+			--no-input \
+			--style=full \
+			--wrap=word \
+			--wrap-sign= \
+			--delimiter / --with-nth -1 \
+			--preview-window='right:40%:wrap' \
+			--preview="ffmpeg -i {} -vf "thumbnail,scale=320:-1" -frames:v 1 -f image2pipe pipe:1 -loglevel quiet | img2sixel -q low"
+		)"
+	[[ -z "$media_file" ]] && exit 0
+	mpv "$media_file"
+}
+if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+	wayland_block
+else
+	tty_block
+fi

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 cd $HOME/misc/dmenu
 make clean install > /dev/null & disown
 exit 0

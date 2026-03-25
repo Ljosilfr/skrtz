@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -m
+wallpaper=$(
+	find "$HOME/wlpr_imgs" \
+		-regextype posix-extended \
+		-type f ! -iregex '^.*[.](directory|webp)$' |
+	sort | fzf \
+	--cycle \
+	--delimiter / \
+	--no-input \
+	--reverse \
+	--style=full \
+	--with-nth -1 \
+	--wrap \
+	--wrap-sign= \
+	--preview="
+	magick {} \
+		-quality 50 \
+		-thumbnail 450x \
+		-gravity center \
+		-crop 450x260+0+0 - | \
+	img2sixel -q low"
+)
+[[ -z "$wallpaper" ]] && exit 1
+wallust run "$wallpaper" >/dev/null 2>&1 &
+swww img "$wallpaper" >/dev/null 2>&1 & 

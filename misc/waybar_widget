@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 waybar \
 	-c $HOME/.config/waybar/widgets/info_widget.conf \
 	-s $HOME/.config/waybar/widgets/info_widget.css

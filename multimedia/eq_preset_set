@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+list_file=$HOME/.config/easyeffects_preset_list.txt
+active_preset="$(easyeffects -a output)"
+generate_list_file() {
+	easyeffects -p |
+	awk '
+		/^Output/ { in_output=1; next }
+		/^[[:space:]]*Input/ { in_output=0 }
+		in_output && NF {
+			sub(/^[[:space:]]*[0-9]+[[:space:]]+/, "")
+			if ($0 !~ /^No/ && NF)
+				print
+		}
+	' \
+	| sort > $list_file
+}
+[[ ! -f "$list_file" ]] && generate_list_file
+[[ "$@" == "--refresh" ]] && {
+	generate_list_file
+	exit 0
+}
+active_sign="󰺢"
+chosen_preset=$(
+	cat $list_file |
+	sed "/$active_preset/s/^/$active_sign /" |
+	fuzzel \
+		--dmenu \
+		--width 25 \
+		--hide-prompt |
+	sed "s/$active_sign //g"
+)
+[[ -z "$chosen_preset" ]] && exit 1
+[[ "$active_preset" == "$chosen_preset" ]] && {
+    notify-send "The preset you've just selected is already set!"
+    exit 0
+}
+if easyeffects -l "$chosen_preset"; then
+    notify-send "Sound profile “${chosen_preset}” has been set successfully!"
+else
+    notify-send "Could not set profile “${chosen_preset}”, an error has occurred!"
+fi

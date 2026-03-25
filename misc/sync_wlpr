@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -m
+URL=$(wl-paste)
+[[ ! "$URL" =~ ^(http?s[://].*[.]png|http?s[://].*[.]jpg)$ ]] && {
+	notify-send "No image URL has been provided!"
+	exit 1
+}
+if curl -s -O "$URL" --output-dir $HOME/wlpr_imgs/ ; then
+	notify-send "Image synced from URL to wlpr_imgs!"
+else
+	notify-send "Couldn't sync image from URL!"
+fi

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -m
+menu_list="\
+mpv_fzf
+sync_media
+sync_wlpr
+check_storage"
+fzo=$(
+	echo -e "$menu_list" |
+	fuzzel \
+		--dmenu \
+		--hide-prompt \
+		--width 13
+)
+$fzo

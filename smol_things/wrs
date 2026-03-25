@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+isiton=$(pgrep -x waybar)
+[[ -n "$isiton" ]] && killall waybar
+waybar >/dev/null 2>&1 & disown
+#waybar_widget >/dev/null 2>&1 & disown

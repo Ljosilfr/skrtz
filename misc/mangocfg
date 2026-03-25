@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+pgrep -x fuzzel && {
+	killall -e fuzzel
+	exit 0
+}
+list_entries="\
+󱢣 General
+ Keybinds
+ Startup
+󱃻 Variables
+󱂬 WindowRules
+󱢣 Animations"
+entry_chosed=$(
+	echo -e "$list_entries" |
+    fuzzel \
+        --dmenu \
+		--width 13 \
+		--hide-prompt |
+    cut -d' ' -f2-
+)
+case "$entry_chosed" in
+    General)
+		conf_file="~/.config/mango/config.conf"
+		;;
+    Keybinds)
+		conf_file="~/.config/mango/keybinds.conf"
+		;;
+    Startup)
+		conf_file="~/.config/mango/startup.conf"
+		;;
+    Variables)
+		conf_file="~/.config/mango/variables.conf"
+		;;
+    WindowRules)
+		conf_file="~/.config/mango/windowrules.conf"
+		;;
+    Animations)
+		conf_file="~/.config/mango/animations.conf"
+		;;
+esac
+[[ -n "$entry_chosed" ]] && {
+	footclient \
+	bash -c "
+		(cat ~/.cache/wallust/sequences &)
+		nvim ${conf_file}
+	"
+}

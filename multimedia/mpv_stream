@@ -1,3 +1,0 @@
-#!/bin/bash
-url=$(clipvault list | clipvault get)
-[[ -n "$url" ]] && mpv "$url"

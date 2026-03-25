@@ -1,8 +1,0 @@
-#!/bin/bash
-file="~/screen_dumps/$(date +%s%N_)screenshot.png"
-case "$1" in
-	-s) wayshot -g --clipboard "$file";;
-	-o) wayshot "$file";;
-	*);;
-esac
-[[ -f "$file" ]] && notify-send -i $file "Screen dumped sucessfuly" "$file"

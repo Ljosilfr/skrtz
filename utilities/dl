@@ -1,6 +1,0 @@
-#!/bin/bash
-if axel "$@"; then
-	notify-send -i download "All files downloaded!"
-else
-	notify-send -i error "Download failed"
-fi

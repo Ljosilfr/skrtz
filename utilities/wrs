@@ -1,8 +1,0 @@
-#!/bin/bash
-if pgrep -x waybar; then
-    killall -e waybar
-    waybar 2>&1 > /dev/null &
-    waybar_widget 2>&1 > /dev/null &
-else
-    waybar_widget 2>&1 > /dev/null &
-fi

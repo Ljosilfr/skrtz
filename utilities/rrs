@@ -1,7 +1,0 @@
-#!/bin/bash
-if pgrep -x riftbar; then 
-	killall -e riftbar
-    riftbar 2>&1 > /dev/null &
-else
-	riftbar 2>&1 > /dev/null & 
-fi

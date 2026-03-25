@@ -1,9 +1,0 @@
-#!/bin/bash
-pgrep -x rofi && {
-	killall -e rofi 
-    exit 0
-}
-rofi \
-    -show drun \
-    -theme app_launcher \
-    -no-fixed-num-lines

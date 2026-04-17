@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+footclient bash -c "
+	fc-list : family | sort -u |
+	fzf \
+		--reverse \
+		--cycle \
+		--style=full \
+		--wrap \
+		--wrap-sign="" \
+		| wl-copy
+"

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+paplay "$HOME/misc/notification_sound.mp3" --volume=22300

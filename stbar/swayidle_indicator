@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+PID=$(pgrep -x swayidle)
+case "$1" in
+    -t)
+        if [[ -n "$PID" ]]; then
+            kill "$PID"
+        else
+            swayidle_init & disown
+        fi
+    ;;
+    -s)
+        if [[ -n "$PID" ]]; then
+            echo "<span size='13.5pt' rise='-1500'></span>"
+        else
+            echo "<span size='13.5pt' rise='-1500'></span>"
+        fi
+    ;;
+esac

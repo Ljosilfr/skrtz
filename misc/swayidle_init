@@ -4,6 +4,6 @@ pgrep -x swayidle && {
     exit 1
 }
 swayidle -w \
-    timeout 290 'dim -a 0.8' \
+    timeout 290 'chayang -d 8' \
     timeout 300 'wlr-randr --output VGA-1 --off' \
     resume 'wlr-randr --output VGA-1 --on' \

@@ -8,48 +8,33 @@ set -euo pipefail
 	notify-send "MPV is already running!"
 	exit 0
 }
-wayland_block () {
-	footclient -T mpv_fzf bash -c '
+footclient -a mpv_fzf_scratchpad bash -c '
+	while true
+	do
 		set -m
-		media_file="$(
-			find "$HOME"/.temp_streaming/* \
-				-type f \
-				! -iregex ".*aria2.*" |
-			sort | fzf \
-				--reverse \
-				--no-input \
-				--style=full \
-				--wrap=word \
-				--wrap-sign= \
-				--delimiter / --with-nth -1 \
-				--preview-window='right:40%:wrap' \
-				--preview="ffmpeg -i {} -vf "thumbnail,scale=320:-1" -frames:v 1 -f image2pipe pipe:1 -loglevel quiet | img2sixel -q low"
-			)"
-		[[ -z "$media_file" ]] && exit 0
-		mpv --no-terminal "$media_file" & disown
-	'
-}
-tty_block () {
-	set -m
-	media_file="$(
 		find "$HOME"/.temp_streaming/* \
 			-type f \
-			! -iregex ".*aria2.*" |
-		sort | fzf \
+			! -iregex ".*aria2.*" | sort | 
+		fzf \
+			--bind "enter:execute:nohup mpv --no-terminal {} >/dev/null 2>&1 & disown" \
 			--reverse \
+			--cycle \
 			--no-input \
 			--style=full \
 			--wrap=word \
 			--wrap-sign= \
 			--delimiter / --with-nth -1 \
 			--preview-window='right:40%:wrap' \
-			--preview="ffmpeg -i {} -vf "thumbnail,scale=320:-1" -frames:v 1 -f image2pipe pipe:1 -loglevel quiet | img2sixel -q low"
-		)"
-	[[ -z "$media_file" ]] && exit 0
-	mpv "$media_file"
-}
-if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
-	wayland_block
-else
-	tty_block
-fi
+			--preview="
+				ffmpeg \
+					-i {} \
+					-ss 00:00:28 \
+					-vf "thumbnail" \
+					-vf scale=490:-1 \
+					-frames:v 1 \
+					-f image2pipe pipe:1 \
+					-loglevel quiet |
+				chafa
+				"
+	done
+'

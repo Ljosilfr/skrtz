@@ -1,15 +1,25 @@
 #!/usr/bin/env bash
-set -m
-menu_list="\
+launch_menu() {
+chosen_script=$(
+fuzzel \
+	--dmenu \
+	--hide-prompt \
+	--width 14 \
+<<EOF
+wleave
 mpv_fzf
 sync_media
 sync_wlpr
-check_storage"
-fzo=$(
-	echo -e "$menu_list" |
-	fuzzel \
-		--dmenu \
-		--hide-prompt \
-		--width 13
+font_list
+openvpn_init
+wallpaper_fzf
+check_storage
+EOF
 )
-$fzo
+"$chosen_script"
+}
+pgrep -x fuzzel && {
+	killall -e fuzzel
+	exit 0
+}
+launch_menu

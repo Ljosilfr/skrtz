@@ -1,21 +1,30 @@
 #!/usr/bin/env bash
+data_file="$HOME/.config/lutris_gamelist.json"
 set -euo pipefail
 pgrep -x fuzzel && {
     killall -e fuzzel
     exit 0
 }
-data_file="$HOME/.config/lutris_gamelist.json"
 generate_data_file() {
     lutris --list-games --json > "$data_file"
 }
 [[ ! -f "$data_file" ]] && generate_data_file
-[[ "${1:-}" == "--refresh" ]] && {
+[[ "${@:-}" == "--refresh" ]] && {
 	rm "$data_file"
 	generate_data_file
+	notify-send "Lutris wrapper database has been updated!"
+	exit
+}
+[[ "${@:-}" == "--gamescope" ]] && {
+	arg="--mesg"
+	mesg="gamescope=on"
+	microcompositor=1
 }
 chosen_game=$(
 	jq -r '.[].name' "$data_file" |
     fuzzel \
+		"${arg:-}" "${mesg:-}" \
+		--mesg-mode expand \
 		--hide-prompt \
         --dmenu \
 		--minimal-lines \
@@ -24,31 +33,10 @@ chosen_game=$(
 ) 
 [[ -z "$chosen_game" ]] && exit 1
 game_id=$(
-	jq -r --arg n "$chosen_game" '
-		.[] | select(.name == $n) | .id
-	' "$data_file"
+	jq \
+		-r \
+		--arg n "$chosen_game" \
+		'.[] | select(.name == $n) | .id' \
+		"$data_file"
 )
-[[ -z "$game_id" ]] && exit 1
-[[ "${1:-}" == "--gamescope" ]] && {
-	screen_width=1440
-	screen_height=800
-	case "$game_id" in
-		17)
-			screen_width="1152"
-			screen_height="720"
-		;;
-		36|37|35|19|5)
-			screen_width="1280"
-			screen_height="800"
-		;;
-		*);;
-	esac
-	gamescope \
-		--expose-wayland \
-		--force-windows-fullscreen \
-		--force-grab-cursor \
-		--fullscreen \
-		-w "$screen_width" -h "$screen_height" \
-		-- lutris lutris:rungameid/"$game_id"
-}
-[[ -z "${@:-}" ]] && lutris lutris:rungameid/"$game_id"
+[[ -n "$game_id" ]] && lutris lutris:rungameid/"$game_id"

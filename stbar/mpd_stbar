@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+mpd_status=$(mpc status | grep -oE "^[[].*[]]")
+status_icon=󰽳
+if [[ "$mpd_status" == "[playing]" ]]; then
+	status_icon=󰎇
+elif [[ "$mpd_status" == "[paused]" ]]; then
+	status_icon=󰽴
+fi
+status_icon() {
+	echo "<span size='13.5pt' rise='-1500'>$status_icon</span>"
+}
+title_n_artist() {
+echo "\
+$(
+	mpc -f "%title%" current |
+	sed 's/\\[.*\\]//g; s/(.*)//g' |
+	awk '{for(i=1; i<=NF && i<=4; i++) printf "%s%s", $i, (i==NF || i==4 ? "" : " "); print ""}' 
+) — \
+$(
+	mpc -f "%albumartist%" current |
+	awk '{for(i=1; i<=NF && i<=4; i++) printf "%s%s", $i, (i==NF || i==4 ? "" : " "); print ""}' 
+)"
+}
+if [[ -n "$mpd_status" ]]; then
+	echo "$(status_icon) $(title_n_artist)"
+else
+	echo "$(status_icon)"
+fi

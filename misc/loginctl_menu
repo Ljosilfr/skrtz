@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+what_to_do=$(
+	fuzzel \
+		--dmenu \
+		--hide-prompt \
+		--width 9 \
+<<EOF
+Shutdown
+Reboot
+EOF
+)
+case "$what_to_do" in
+	Shutdown)
+		command="loginctl poweroff"
+		;;

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+curl 'wttr.in/Ocumare+del+Tuy?format=%c+%f' | sed 's/  / /g'

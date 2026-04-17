@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+scrdmp_dir="$HOME/screen_dumps"
+scrdmp_fl="${scrdmp_dir}/$(date "+%s%N").png"
+[[ ! -d "$scrdmp_dir" ]] && mkdir "$scrdmp_dir"
+check_notify_copy() {
+	[[ ! -f "$scrdmp_fl" ]] && {
+		notify-send 'Screendump either cancelled or failed!'
+		exit 1
+	}
+	notify-send -i "$scrdmp_fl" "Screen dumped!"
+	wl-copy < "$scrdmp_fl"
+}
+case "$@" in
+	--section)
+		grim -l 4 -g "$(slurp)" "$scrdmp_fl"
+		check_notify_copy
+		;;
+	*)
+		grim -l 4 "$scrdmp_fl"
+		check_notify_copy
+		;;
+esac

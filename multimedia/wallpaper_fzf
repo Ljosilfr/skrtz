@@ -1,26 +1,29 @@
 #!/usr/bin/env bash
 set -m
-wallpaper=$(
-	find "$HOME/wlpr_imgs" \
-		-regextype posix-extended \
-		-type f ! -iregex '^.*[.](directory|webp)$' |
-	sort | fzf \
-	--cycle \
-	--delimiter / \
-	--no-input \
-	--reverse \
-	--style=full \
-	--with-nth -1 \
-	--wrap \
-	--wrap-sign= \
-	--preview="
-	magick {} \
-		-quality 50 \
-		-thumbnail 450x \
-		-gravity center \
-		-crop 450x260+0+0 - | \
-	img2sixel -q low"
-)
-[[ -z "$wallpaper" ]] && exit 1
-wallust run "$wallpaper" >/dev/null 2>&1 &
-swww img "$wallpaper" >/dev/null 2>&1 & 
+footclient -a wallpaper_fzf_scratchpad bash -c '
+	rg "$HOME/wlpr_imgs" \
+		-g "*.{png,jpg}" \
+		--files \
+		--sortr created |
+	fzf \
+		--no-input \
+		--cycle \
+		--delimiter / \
+		--reverse \
+		--style=full \
+		--with-nth -1 \
+		--wrap \
+		--wrap-sign= \
+		--bind "enter:execute:
+			nohup wallust run {} >/dev/null 2>&1 & disown
+			nohup awww img {} >/dev/null 2>&1 & disown
+		" \
+		--preview="
+			magick {} \
+				-quiet \
+				-thumbnail 450x \
+				-gravity center \
+				-crop 450x260+0+0 - | \
+			chafa
+		"
+'

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -m
+output_directory="$HOME/.temp_streaming"
+[[ ! -d "$output_directory" ]] && mkdir "$output_directory"
+menu_list=$(
+fzf \
+	--cycle \
+	--no-input \
+	--reverse \
+	--style=full \
+<<EOF | awk '{print $1}'
+Sync file from copied URL
+Clean directory's content
+EOF
+)
+alternative_list() {
+alt_list=$(
+fzf \
+	--header="Nothing to clean, directory's empty!" \
+	--header-border=top \
+	--list-border=rounded \
+	--reverse \
+	--no-input \
+<<EOF | awk '{print $1}'
+Sync file from copied URL
+Exit
+EOF
+)
+}
+check_clipboard() {
+	[[ ! "$(wl-paste)" =~ ^(https[://].*|http[://].*)$ ]] && {
+		notify-send "No media URL has been provided!"
+		exit 1
+	}
+}
+download_content() {
+	while true
+	do
+		aria2c -d $output_directory $(wl-paste)
+		echo
+		read -p 'Download something else? [Y/n]: ' continue_dl
+		[[ ! "$continue_dl" =~ ^([yY]|"")$ ]] && break
+	done
+}
+clean_directory() {
+	if [[ -n $(ls "$output_directory") ]]; then
+		rm "${output_directory}"/*
+	else
+		notify-send "Nothing to clean, directory is empty!"
+	fi
+}
+case "$menu_list" in
+	Sync)
+		check_clipboard
+		download_content
+		;;
+	Clean)
+		clean_directory
+		alternative_list
+		[[ "$alt_list" = "Sync" ]] && {
+			check_clipboard
+			download_content
+		}
+		;;
+esac

@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-notify-send "󰋊 Home — Available space: $(dysk --json /home | jq -r '.[] | .stats.available')B"

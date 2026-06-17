@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+input="$1"; scriptname="$(basename "$0")"
+#------------------------------------------#
+msgs=(
+	"Swayidle has been started!"
+	"Swayidle has been stopped!"
+	"Swayidle has been restarted!"
+	"Swayidle is already running!"
+	"Swayidle is not running!"
+)
+usage="Usage: $scriptname [--daemonise] [--restart] [--slay]"
+#---------------------------------------------------------------#
+abort_if_proper() { pgrep -x swayidle &>/dev/null; }
+slay() { pkill -x swayidle; }
+#------------------------------------#
+call_soul() {
+	exec -a sleepymangod swayidle -w \
+	timeout 300 'chayang -d 8 && wlr-randr --output VGA-1 --off' \
+	resume 'wlr-randr --output VGA-1 --on' &>/dev/null & disown
+}
+daemonise() {
+	abort_if_proper && {
+		echo "${msgs[3]}"; exit 1; } || {
+			call_soul; } && {
+		echo "${msgs[0]}"; exit 0; }
+}
+slay_bury() {
+	slay && {
+		echo "${msgs[1]}"; exit 0
+	};	echo "${msgs[4]}"
+}
+slay_resurrect() {
+	slay && { call_soul
+		echo "${msgs[2]}"; exit 0
+	};	echo "${msgs[4]}"
+}
+#------------------------------------------------#
+case "$input" in
+	--daemonise) daemonise; exit 0 ;;
+	--restart) slay_resurrect; exit 1 ;;
+	--slay) slay_bury; exit 0 ;;
+	*) echo "$usage"; exit 1 ;;
+esac
+#------------------------------------------------#

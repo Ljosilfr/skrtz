@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-pgrep -x swayidle && {
-    notify-send "There is a swayidle session running!"
-    exit 1
-}
-swayidle -w \
-    timeout 290 'chayang -d 8' \
-    timeout 300 'wlr-randr --output VGA-1 --off' \
-    resume 'wlr-randr --output VGA-1 --on' \

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#---------------------------------#
+list=(
+	"exec_loginctl_cmd"
+	"modify_games_dots"
+	"modify_scripts_code"
+	"restart_processes"
+	"run_openvpn_daemon"
+	"see_installed_fonts"
+	"streaming_fetcher"
+)
+#--------------------------------------------------------------------#
+menu=$(pkill -x rofi && exit 0; printf '%s\n' "${list[@]}" | rofi \
+		-sync -dmenu -p ">" \
+		-no-fixed-num-lines \
+		-theme simple_menu \
+		-theme-str "window {width: 11em;}")
+case "$menu" in
+	"${list[-1]}") exec footclient "$menu" ;;
+	*) exec "$menu" ;;
+esac
+#----------------------------------------------------#

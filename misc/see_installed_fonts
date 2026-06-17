@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+fc-list : family | awk -F ',' '{print $1}' | sort -u |
+	rofi \
+		-i -dmenu -sync -p ">" \
+		-no-fixed-num-lines \
+		-theme simple_menu \
+		-theme-str "window {width: 18em;}" |
+wl-copy

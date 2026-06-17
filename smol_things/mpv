@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-dynamic_cfg="--profile=wayland-comp"
-[[ -z "$WAYLAND_DISPLAY" ]] && {
-	dynamic_cfg="--profile=tty"
-}
-/usr/bin/mpv "$dynamic_cfg" "$@"

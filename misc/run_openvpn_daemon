@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------#
+icons=("openvpn" "script-error")
+path_to_files="$HOME/.local/share/openvpn/custom_files/"
+#-------------------------------------------------------------------#
+define_msgs() {
+	msgs=(
+		"OpenVPN connection \"${vpn_file:-}\" is up and running!"
+		"Something failed, OpenVPN connection coudln't be started!"
+		"OpenVPN connection has been terminated!"
+		"Something failed, OpenVPN connection coudln't be terminated!"
+	)
+}
+daemonise() {
+	pkill -x rofi && exit 0; set -euo pipefail; vpn_file=$(
+    	rg --files "${path_to_files}" | xargs -n 1 basename |
+		sort | sed 's/.ovpn//g' | rofi \
+			-sync -dmenu \
+            -no-fixed-num-lines \
+            -theme vpn_menu \
+			-theme-str "window {width: 14.5em;}"
+    );	[[ -z "$vpn_file" ]] && exit 0
+	define_msgs && { pkexec openvpn \
+		--config "${path_to_files}${vpn_file}".ovpn \
+		--daemon; } && {
+			notify-send -a "OpenVPN" -i "${icons[0]}" "Connection status" "${msgs[0]}"; exit 0
+		};	notify-send -a "OpenVPN" -i "${icons[1]}" "Connection status" "${msgs[1]}"; exit 1
+}
+slay() {
+	define_msgs && { pkexec pkill -x openvpn; } && {
+		notify-send -a "OpenVPN" -i "${icons[0]}" "Connection status" "${msgs[2]}"; exit 0
+	}; 	notify-send -a "OpenVPN" -i "${icons[1]}" "Connection status" "${msgs[3]}"; exit 1
+}
+#----------------------------------------------------------------------------------------------#
+pgrep -x openvpn &>/dev/null && slay; daemonise
+#------------------------------------------------#

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+input="$1"; scriptname=$(basename "$0"); directory="$HOME/.config/mango"
+#------------------------------------------------------------------------#
+msgs=(
+	'Spicymangod has been started' 'Spicymangod has been stopped'
+	'Spicymangod is not running' 'Spicymangod is already running'
+)
+#-------------------------------...-----------------------------------#
+spicymangod_cmd="inotifywait -m -e modify --format %f "$directory""
+cmdline="$(echo "$spicymangod_cmd" | sed 's/inotifywait/spicymangod/g')"
+#-------------------------------------------------------------------------#
+args=('--daemonise' '--slay')
+usage="Usage: $scriptname ["${args[0]}"] ["${args[1]}"]"
+#--------------------------------------------------------------#
+check_if_running() { pgrep -xf "$cmdline" &>/dev/null; }
+#----------------------------------------------------------#
+run_the_stuff() {
+	check_if_running && { echo "${msgs[3]}"; exit 1; }
+	set -m; bash -c "
+		exec -a spicymangod $spicymangod_cmd |
+		while read -r filename; do
+			mmsg dispatch reload_config
+		done & disown; exit
+	" &>/dev/null; echo "${msgs[0]}"; set +m
+}
+slay_the_daemon() {
+	check_if_running && {
+		pkill -xf "$cmdline"
+		echo "${msgs[1]}"; exit 0
+	};	echo "${msgs[2]}"; exit 1
+}
+#---------------------------------------------#
+case "$input" in
+	"${args[0]}") run_the_stuff; exit 0 ;;
+	"${args[1]}") slay_the_daemon; exit 0 ;;
+	*) echo "${usage}"; exit 1 ;;
+esac
+#---------------------------------------------#

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#------------------------------------------#
+pkill -x 'grim|slurp|wayfreeze' && exit 0
+#------------------------------------------#
+dir="$HOME/screenshots"; mkdir -p "$dir"
+file="${dir}/$(date "+%s%N").png"
+appname="Screenshot Manager"; msgs=(
+	"Screenshot file has been saved"
+	"Storaged file: "${file}""
+	"Screenshot file hasn't been saved"
+	"Screenshot was either cancelled or the script failed at capturing it"
+)
+#----------------------------------------------------------------------------#
+region() {
+	wayfreeze --hide-cursor & PID=$!; sleep .1
+	grim -l 4 -g "$(slurp)" "$file"; kill "$PID"
+};	screen() { grim -l 4 "$file"; }
+notify_copy() {
+	[[ -f "$file" ]] && {
+		notify-send -a "$appname" -i "$file" "${msgs[0]}" "${msgs[1]}"; wl-copy < "$file"; exit 0
+	};	notify-send -a "$appname" -i "camera" "${msgs[2]}" "${msgs[3]}"; exit 1
+}
+#----------------------------------------------------------------------------------------------------------------------#
+case "$1" in
+	--section) region && notify_copy ;;
+	*) screen && notify_copy ;;
+esac
+#-----------------------------------------#

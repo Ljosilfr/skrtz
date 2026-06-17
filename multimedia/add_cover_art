@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#--------------------------------------------------------------#
+dir="output_files"; msgs=(
+	"Select a flac file you want to add cover art to"
+	"Select a cover art file"
+	"There's a file named like that in the output folder"
+)
+#--------------------------------------------------------------#
+fzf_result=$(
+	rg --max-depth 1 --files -g "*.flac" | sort | fzf \
+		--reverse \
+		--header="${msgs[0]}" \
+		--header-border=horizontal \
+		--wrap=word \
+		--wrap-sign= \
+		--delimiter / --with-nth -1 \
+		--no-input \
+		--cycle
+);	[[ -z "$fzf_result" ]] && exit 1; result="${dir}/${fzf_result}"
+#--------------------------------------------------------------------------------------------------------#
+[[ -f "$result" ]] && { dialog --title "$(echo "$PWD")" --infobox "${msgs[2]}" 4 50; read; exec "$0" ;}
+#--------------------------------------------------------------------------------------------------------#
+cover_img=$(
+	rg --files -g "*.{png,jpg}" | fzf \
+		--reverse \
+		--header="${msgs[1]}" \
+		--wrap=word \
+		--wrap-sign= \
+		--delimiter / --with-nth -1 \
+		--header-border=horizontal \
+		--no-input \
+		--preview-window='right:60%:wrap' \
+		--preview="chafa -s 68x {}" \
+		--cycle
+);	[[ -z "$cover_img" ]] && exit 1
+#-------------------------------------------------------------------------------#
+[[ "$1" == "--rename" ]] && { result="${dir}/$(echo "$fzf_result" | vipe )"; }
+#-------------------------------------------------------------------------------#
+mkdir -p "$dir" && { ffmpeg \
+	-i "$fzf_result" -i "$cover_img" \
+	-map 0:a -map 1:v -c copy -map_metadata 0 \
+	-metadata:s:v title="Album cover" \
+	-metadata:s:v comment="Cover (front)" \
+	-disposition:v attached_pic \
+	"$result"; }
+#-----------------------------------------------------------------------------------------#

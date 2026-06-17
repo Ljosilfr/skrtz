@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#-------------------------------------------#
+pkill -x rofi && exit 0; set -euo pipefail
+#----------------------------------------------#
+file="$HOME/.config/lutris_gamelist.json"
+#-------------------------------------------#
+titles=(
+	"Menu database has been updated"
+	"Menu database hasn't been updated"
+)
+msgs=(
+	"Database file: ${file:-}"
+	"Something's failed, double-check the script's code"
+)
+#----------------------------------------------------------------------------#
+generate_db_file() { lutris -lj > "$file"; }
+#---------------------------------------------------------------------------#
+[[ ! -f "$file" ]] && generate_db_file; [[ "${1:-}" == "--refresh" ]] && {
+	generate_db_file && {
+	notify-send -a "Lutris" "${titles[0]}" "${msgs[0]}" && exit 0
+};	notify-send -a "Lutris" "${titles[1]}" "${msgs[1]}" && exit 1; }
+#----------------------------------------------------------------------#
+menu=$(
+	jq -r '.[].name' "$file" |	rofi \
+		-sync -dmenu -i -p ">" \
+		-no-fixed-num-lines \
+		-theme simple_menu \
+		-theme-str "window {width: 26em;}" \
+		-theme-str 'listview {lines: 25;}'
+);	[[ -z "$menu" ]] && exit 1; game_id=$(
+	jq -r --arg n "$menu" \
+		'.[] | select(.name == $n) | .id' "$file"
+);	[[ -n "$game_id" ]] && lutris lutris:rungameid/"$game_id"
+#---------------------------------------------------------------#

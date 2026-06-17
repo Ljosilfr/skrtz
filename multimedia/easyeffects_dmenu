@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------------#
+input="$1"; app="EasyEffects"; list_file="$HOME/.config/eassyeffects_presets.json"
+#-----------------------------------------------------------------------------------#
+generate_list_file() {
+	msgs=(
+		"Preset database has been updated"
+		"Preset database hasn't updated"
+	)
+	easyeffects -p | awk '
+		/^Output/ { in_output=1; next }
+		/^[[:space:]]*Input/ { in_output=0 }
+		in_output && NF {
+			sub(/^[[:space:]]*[0-9]+[[:space:]]+/, "")
+			if ($0 !~ /^No/ && NF)
+				print
+		}'	| sort | jq -nR '[inputs]' > $list_file && {
+			notify-send -a "$app" "${msgs[0]}" "Database file: $list_file"; exit 0
+		};	notify-send -a "$app" "${msgs[1]}" "Database file: $list_file"; exit 1
+}
+display_menu() {
+	#------------------------------------------------------------------#
+	pkill -x rofi && exit 0; active_preset="$(easyeffects -a output)"
+	#------------------------------------------------------------------#
+	chosen_preset="$(
+		jq -r '.[]' "$list_file" |
+		sed "/${active_preset}/s/^/󰺢 /" |
+		rofi \
+			-sync -dmenu -p ">" \
+			-no-fixed-num-lines \
+			-theme simple_menu \
+			-theme-str "window {width: 13em;}" \
+			-theme-str "listview {margin: 0;}" \
+			-theme-str "inputbar {enabled: false;}" \
+			-theme-str "entry {enabled: false;}" \
+		| sed 's/󰺢 //g'
+	)";	[[ -z "$chosen_preset" ]] && exit 1
+	#---------------------------------------------------------------------------#
+	msgs=(
+		"Sound profile \"${chosen_preset}\" has been set successfully"
+		"Couldn't set profile \"${chosen_preset}\", an error has occurred"
+		"The preset \"${chosen_preset}\" is already set and active"
+	)
+	titles=(
+		"Sound profile hasn't been set"
+		"Sound profile hasn't been set"
+	);	
+	#---------------------------------------------------------#
+}
+check_active() {
+	[[ "$active_preset" == "$chosen_preset" ]] && {
+    	notify-send -a "EasyEffects" "${titles[1]}" "${msgs[2]}"; exit 0
+	}
+}
+set_preset() {
+	easyeffects -l "$chosen_preset" && {
+		notify-send -a "$app" "${titles[0]}" "${msgs[0]}"; exit 0
+	};	notify-send -a "$app" "${titles[1]}" "${msgs[1]}"; exit 1
+}
+#---------------------------------------------------------------------------------#
+[[ "$input" == "--refresh" || ! -f "$list_file" ]] && {
+	generate_list_file; exit 0
+};	display_menu; check_active; set_preset
+#--------------------------------------------#

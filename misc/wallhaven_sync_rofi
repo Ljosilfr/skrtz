@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-wlpr_dir="$HOME/wlpr_imgs"
-page="1"
-urls=$(
-	curl \
-		-s "https://wallhaven.cc/api/v1/search?ratios=16x9,16x10&categories=100&purity=100&sorting=toplist&page=$page" |
-	jq -r '.data.[] | .path'
-)
-curl -s -O "$urls" | for a in *.png; do echo -en "$a\0icon\x1f$a\n"; done | rofi -dmenu -theme wallpaper_set

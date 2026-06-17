@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-pgrep -x waybar && {
-	killall -e waybar
-	nohup waybar & disown >/dev/null
-	exit 0
-}
-nohup waybar & disown >/dev/null

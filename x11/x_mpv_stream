@@ -1,3 +1,0 @@
-#!/bin/bash
-url=$(gpaste-client --raw history | head -n1)
-[[ -n "$url" ]] && mpv "$url"

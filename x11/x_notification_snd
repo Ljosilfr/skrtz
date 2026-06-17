@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if pgrep -x pw-play; then 
-	killall pw-play
-	pw-play ~/misc/notification_sound.mp3	
-else 
-	pw-play ~/misc/notification_sound.mp3	
-fi

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#---------------------------------------------------#
+list=(" Lock" "󰍃 Logout" "󰤆 Poweroff" "󰜉 Reboot")
+#---------------------------------------------------#
+menu=$(
+	pkill -x rofi && exit 0; printf '%s\n' "${list[@]}" | rofi \
+		-sync -dmenu \
+		-no-fixed-num-lines \
+		-theme simple_menu \
+		-theme-str "window {width: 7em;}" \
+		-theme-str "listview {margin: 0;}" \
+		-theme-str "inputbar {enabled: false;}" \
+		-theme-str "* {font: 'JetBrainsMonoNL Nerd Font Propo ExtraBold 16px';}"
+);	case "$menu" in
+		"${list[0]}") gtklock ;;
+		"${list[1]}") loginctl kill-user $USER ;;
+		"${list[2]}") loginctl poweroff ;;
+		"${list[3]}") loginctl reboot ;;
+		*) exit 1 ;;
+esac
+#----------------------------------------------------------#

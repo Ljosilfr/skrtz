@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#-----------------------------#
+dir="$HOME/.temp_streaming"
+#--------------------------------------------#
+msgs=(
+	"No media URL has been provided!"
+	"Done. Choose an option to proceed"
+	"Nothing to clean, directory is empty!"
+	"What do we do now?"
+)
+list=(
+	"Sync file from copied URL"
+	"Clean directory"
+	"Exit"
+)
+#--------------------------------------------#
+mkdir -p "$dir"
+#----------------------------------------#
+show_prompt() {
+cat <<EOF
+
+Download something else: [ 1 | Return ]
+
+Clean, then exit: [ 2 ]
+Clean, then download: [ 3 ]
+
+Exit [ 5 | Press any key ]
+Back to menu: [ 4 ]
+
+EOF
+}
+main_menu_func() {
+	main_menu=$(
+		printf '%s\n' "${list[@]}" |
+		fzf \
+			--cycle \
+			--no-input \
+			--reverse \
+			--list-border=rounded
+	);	[[ -z "$main_menu" ]] && return 1
+	case "$main_menu" in
+		"${list[0]}") init_manager || exec "$0" ;;
+		"${list[1]}") check_dir_n_clean || exec "$0" ;;
+		"${list[2]}") exit 0 ;;
+	esac
+}
+aux_menu_func() {
+	aux_menu=$(
+		printf '%s\n' "${list[@]}" | 
+		fzf \
+			--header="${msgs[1]}" \
+			--header-border=top \
+			--list-border=rounded \
+			--reverse \
+			--no-input
+	);	[[ -z "$aux_menu" ]] && return 1
+	case "$aux_menu" in
+		"${list[0]}") init_manager ;;
+		"${list[1]}") check_dir_n_clean ;;
+		"${list[2]}") return 1;;
+	esac
+}
+clean_dir() { rm -f "${dir}"/*; }
+download() {
+	[[ ! "$(wl-paste)" =~ ^https?:// ]] && {
+		dialog --title "$dir" --infobox "${msgs[0]}" 4 50; read; return 1
+	};	aria2c -d "$dir" "$(wl-paste)" || { read; return 1; } 
+}
+check_dir_n_clean() {
+	rg --files "$dir" -g '*.{mkv,mp4,avi,webm}' && {
+		clean_dir && aux_menu_func || return 1; } || {
+			dialog --title "$dir" --infobox "${msgs[2]}" 4 50; read; return 1
+		}
+}
+init_manager() {
+	while true; do
+		download || return 1; show_prompt
+		read -rn 1 -p "${msgs[3]}: " keep_on || return 1
+		case "$keep_on" in
+			1|"") continue ;;
+			2) clean_dir && return 0 ;;
+			3) clean_dir && continue ;;
+			4) return 1 ;;
+			5|*) return 0 ;;
+		esac
+	done
+};	main_menu_func
+#----------------------------------------------------------------------------------#

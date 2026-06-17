@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+case "$1" in
+	-files) footclient -a kz_files -- yazi ;;
+	-films) footclient -a kz_films -- media_library ;;
+	-mixer) footclient -a kz_mixer -- wiremix -p off --no-mouse ;;
+	-music) footclient -a kz_music -- rmpc ;;
+	-tasks) footclient -a kz_tasks -- btop ;;
+	-thems) footclient -a kz_thems -- themetiser ;;
+	-termn) footclient -a kz_termn ;;
+	*) notify-send -a "Scratchpad Manager" -i "window-manager" "Unknown command" "Whatever you tried to launch wasn't found. Check the code" ;;
+esac

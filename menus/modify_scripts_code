@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#------------------------#
+pkill -x rofi && exit 0
+#-------------------------------------------------#
+list_items=$(
+	rg --files "$HOME/skrtz/" | sort | rofi \
+		-sync \
+		-dmenu \
+		-p ">" \
+		-no-fixed-num-lines \
+		-theme-str 'window {width: 25em;}' \
+		-theme-str 'listview {lines: 17;}' \
+		-theme simple_menu
+);	[[ -n "$list_items" ]] && footclient nvim "$list_items"
+#-------------------------------------------------------------#

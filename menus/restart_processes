@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#------------------------#
+pkill -x rofi && exit 0
+#---------------------------------------------#
+array=("vibepanel" "mpd-mpris" "footserver")
+#--------------------------------------------------#
+run_app() { "${app}" &>/dev/null & disown; }
+main_func() { pkill -x "${app}" && { run_app; } || run_app; }
+#--------------------------------------------------------------#
+app=$(
+	printf '%s\n' "${array[@]}" | rofi \
+		-sync -dmenu -p ">" \
+		-no-fixed-num-lines \
+		-theme simple_menu \
+		-theme-str "window {width: 8em;}"
+);	[[ -n "$app" ]] && main_func
+#--------------------------------------------#

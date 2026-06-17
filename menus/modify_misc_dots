@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#------------------------#
+pkill -x rofi && exit 0
+#--------------------------------------------#
+dir="$HOME/.config"; apps=(
+	"vibepanel" "mango" "wallust" "yazi"
+	"nvim" "wswitch" "waybar" "foot" "fuzzel"
+	"mpd" "mpv" "cava" "fastfetch" "rofi"
+);	paths=("${apps[@]/#/${dir}/}")
+#---------------------------------------------------------------#
+menu=$(
+	rg --files "${paths[@]}" \
+		-g "*.{toml,conf,ini,css,jsonc,json,rasi,lua}" |
+	sort | rofi \
+		-sync -dmenu -i -p ">" \
+		-no-fixed-num-lines \
+		-theme-str 'window {width: 25em;}' \
+		-theme-str 'listview {lines: 17;}' \
+		-theme simple_menu || exit 1
+);	[[ -n "$menu" ]] && footclient nvim "$menu"
+#-----------------------------------------------------------#

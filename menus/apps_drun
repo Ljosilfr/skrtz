@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+pkill -x rofi && exit 0; rofi \
+	-show drun \
+	-display-drun ">" \
+	-no-fixed-num-lines \
+	-theme app_launcher \
+	-theme-str 'window {width: 30em;}'

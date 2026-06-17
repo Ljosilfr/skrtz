@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#------------------------#
+pkill -x rofi && exit 0
+#---------------------------------------------------------------------#
+main_dir="$HOME/games"; aux_dir="${main_dir}/saves-n-config-files"
+#------------------------------------------------------------------#
+list_array=(
+	"${main_dir}/dark-souls-prepare-to-die/DSfix.ini"
+	"${main_dir}/star-wars-knights-of-the-old-republic/swkotor.ini"
+	"${main_dir}/star-wars-knights-of-the-old-republic-ii-the-sith-lords/swkotor2.ini"
+	"${aux_dir}/Skyrim/Skyrim.ini"
+	"${aux_dir}/Skyrim/SkyrimPrefs.ini"
+	"${aux_dir}/Skyrim/localpath/DLCList.txt"
+	"${aux_dir}/Skyrim/localpath/loadorder.txt"
+)
+#----------------------------------------------------#
+file=$(
+	printf '%s\n' "${list_array[@]}" | sort | rofi \
+		-sync -dmenu -p ">" \
+		-theme simple_menu \
+		-theme-str "window {width: 42em;}" \
+		-no-fixed-num-lines
+);	[[ -n "$file" ]] && footclient nvim "${file}"
+#----------------------------------------------------#

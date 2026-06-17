@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#-----------------------------------#
+msgs=(
+	"There's nothing there"
+	"The media directory is empty"
+	"MPV is already running!"
+);	dir="$HOME/.temp_streaming"
+#----------------------------------------------------------------------------------------#
+pgrep -x mpv && { dialog --title "$dir" --infobox "${msgs[2]}" 4 50; read; exec "$0"; }
+#------------------------------------------------------------------------------------#
+while true; do
+	set -euo pipefail; file -i "$dir"/* | rg "video" &>/dev/null || {
+		dialog --title "$dir" --infobox "${msgs[1]}" 4 50; read; break
+	};	rg --files "$dir" -g "*.{mkv,avi,mp4,webm}" -g "!*.{aria2,aria2c}" --sort path | fzf \
+			--reverse --cycle --list-border=rounded \
+			--wrap=word --wrap-sign= --delimiter "/" --with-nth -1 \
+			--preview-window='right:40%:wrap' --preview="
+				ffmpeg \
+					-i {} -ss 00:00:28 \
+					-vf "thumbnail" -vf scale=490:-1 \
+					-frames:v 1 -f image2pipe pipe:1 \
+					-loglevel quiet | chafa" \
+			--bind "enter:execute-silent(mpv --no-terminal {} &>/dev/null & disown)"; break
+done &&	exec "$0"
+#--------------------------------------------------------------------------------------------------#

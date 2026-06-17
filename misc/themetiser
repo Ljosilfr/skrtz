@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#---------------------------------------------------------------------#
+rg "$HOME/misc/images/backgrounds" --files -g "*.{png,jpg,webp}" \
+	 --sortr created | fzf \
+	--cycle --reverse --wrap \
+	--list-border=rounded \
+	--with-nth -1 --wrap-sign="" --delimiter "/" \
+	--preview="
+		magick {} \
+			-quality 95 \
+			-quiet -strip \
+			-thumbnail 450x \
+			-gravity center \
+			-crop 450x260+0+0 +repage png:- | \
+		chafa -" \
+	--bind "enter:execute-silent(awww img {} &>/dev/null)+execute(wallust run {}; echo Press any key to go back to the menu; read)"
+#--------------------------------------------------------------------------------------------------------------------------------------#
